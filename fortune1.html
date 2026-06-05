@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fortune風抽選</title>
+
+<style>
+body{
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:sans-serif;
+    text-align:center;
+}
+
+.container{
+    padding:20px;
+}
+
+h1{
+    font-size:40px;
+}
+
+#number{
+    font-size:180px;
+    font-weight:bold;
+    margin:40px 0;
+    color:#00ffcc;
+    text-shadow:0 0 25px #00ffcc;
+}
+
+button{
+    font-size:28px;
+    padding:15px 40px;
+    margin:10px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+}
+
+#drawBtn{
+    background:#ff4444;
+    color:white;
+}
+
+#resetBtn{
+    background:#444;
+    color:white;
+}
+
+input{
+    font-size:24px;
+    width:120px;
+    text-align:center;
+}
+
+#history{
+    margin-top:30px;
+    font-size:24px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>抽選システム</h1>
+
+<p>
+参加人数：
+<input type="number" id="maxNum" value="10" min="1">
+<button onclick="setup()">設定</button>
+</p>
+
+<div id="number">--</div>
+
+<button id="drawBtn" onclick="draw()">抽選開始</button>
+<button id="resetBtn" onclick="setup()">リセット</button>
+
+<div id="history"></div>
+
+</div>
+
+<script>
+
+let remaining = [];
+let rolling = false;
+
+function setup(){
+
+    const max =
+        parseInt(document.getElementById("maxNum").value);
+
+    remaining = [];
+
+    for(let i=1;i<=max;i++){
+        remaining.push(i);
+    }
+
+    document.getElementById("number").innerText="--";
+    document.getElementById("history").innerHTML=
+        "残り " + remaining.length + " 人";
+}
+
+function draw(){
+
+    if(rolling) return;
+
+    if(remaining.length===0){
+        document.getElementById("number").innerText="終了";
+        return;
+    }
+
+    rolling=true;
+
+    let count=0;
+
+    const interval=setInterval(()=>{
+
+        const max=
+        parseInt(document.getElementById("maxNum").value);
+
+        const rand=
+        Math.floor(Math.random()*max)+1;
+
+        document.getElementById("number")
+        .innerText=String(rand).padStart(2,"0");
+
+        count++;
+
+        if(count>40){
+
+            clearInterval(interval);
+
+            const idx=
+            Math.floor(Math.random()*remaining.length);
+
+            const result=
+            remaining.splice(idx,1)[0];
+
+            document.getElementById("number")
+            .innerText=
+            String(result).padStart(2,"0");
+
+            document.getElementById("history")
+            .innerHTML=
+            "抽選済み: " +
+            (parseInt(document.getElementById("maxNum").value)
+             - remaining.length)
+            +
+            " / "
+            +
+            document.getElementById("maxNum").value
+            +
+            "<br>残り "
+            +
+            remaining.length
+            +
+            " 人";
+
+            rolling=false;
+        }
+
+    },50);
+}
+
+setup();
+
+</script>
+
+</body>
+</html>
